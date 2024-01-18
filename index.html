@@ -1,128 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    /* Add some basic styling for the board cells */
-    .cell {
-      width: 50px;
-      height: 50px;
-      text-align: center;
-      font-size: 24px;
-      border: 1px solid #000;
-      cursor: pointer;
-    }
-  </style>
-  <title>Tic Tac Toe</title>
-</head>
-<body>
-
-<script>
-  // Gameboard object
-  const Gameboard = {
-    board: ['', '', '', '', '', '', '', '', ''],
-
-    // Function to initialize the board
-    initBoard: function () {
-      this.board = ['', '', '', '', '', '', '', '', ''];
-    },
-
-    // Function to make a move on the board
-    makeMove: function (index, player) {
-      if (this.board[index] === '' && index >= 0 && index < 9) {
-        this.board[index] = player.symbol;
-        return true; // Move successful
-      }
-      return false; // Invalid move
-    },
-
-    // Function to check if the board is full
-    isBoardFull: function () {
-      return !this.board.includes('');
-    },
-
-    // Function to check for a winner
-    checkWinner: function () {
-      const winPatterns = [
-        [0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
-        [0, 3, 6], [1, 4, 7], [2, 5, 8], // Columns
-        [0, 4, 8], [2, 4, 6]             // Diagonals
-      ];
-
-      for (const pattern of winPatterns) {
-        const [a, b, c] = pattern;
-        if (this.board[a] !== '' && this.board[a] === this.board[b] && this.board[b] === this.board[c]) {
-          return this.board[a]; // Return the winning symbol
-        }
-      }
-
-      return null; // No winner yet
-    }
-  };
-
-  // Player object
-  function Player(name, symbol) {
-    this.name = name;
-    this.symbol = symbol;
-  }
-
-  // Game controller object
-  const GameController = {
-    currentPlayer: null,
-
-    // Function to switch players
-    switchPlayer: function () {
-      this.currentPlayer = (this.currentPlayer === player1) ? player2 : player1;
-    },
-
-    // Function to handle a move
-    handleMove: function (index) {
-      if (Gameboard.makeMove(index, this.currentPlayer)) {
-        updateBoard();
-        const winner = Gameboard.checkWinner();
-        if (winner) {
-          alert(`${winner} wins!`);
-          resetGame();
-        } else if (Gameboard.isBoardFull()) {
-          alert("It's a tie!");
-          resetGame();
-        } else {
-          this.switchPlayer();
-        }
-      }
-    }
-  };
-
-  // Create players
-  const player1 = new Player('Player 1', 'X');
-  const player2 = new Player('Player 2', 'O');
-
-  // Initialize the game with player1 starting
-  GameController.currentPlayer = player1;
-
-  // Function to reset the game
-  function resetGame() {
-    Gameboard.initBoard();
-    updateBoard();
-    GameController.currentPlayer = player1;
-  }
-
-  // Function to update the HTML board
-  function updateBoard() {
-    for (let i = 0; i < 9; i++) {
-      const cellElement = document.getElementById(`cell${i}`);
-      cellElement.textContent = Gameboard.board[i];
-    }
-  }
-
-  // Create the HTML board
-  document.write('<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px;">');
-  for (let i = 0; i < 9; i++) {
-    document.write(`<div id="cell${i}" class="cell" onclick="GameController.handleMove(${i})"></div>`);
-  }
-  document.write('</div>');
-</script>
-
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <title>Tic Tac Toe</title>
+  </head>
+  <body>
+    <main>
+      <h1>Tic Tac Toe Game</h1>
+      <div id="game-container">
+        <div class="cell" data-index="0"></div>
+        <div class="cell" data-index="1"></div>
+        <div class="cell" data-index="2"></div>
+        <div class="cell" data-index="3"></div>
+        <div class="cell" data-index="4"></div>
+        <div class="cell" data-index="5"></div>
+        <div class="cell" data-index="6"></div>
+        <div class="cell" data-index="7"></div>
+        <div class="cell" data-index="8"></div>
+      </div>
+      <div id="message-container">
+        <p id="message"></p>
+        <button id="reset-btn" onclick="resetGame()">Reset Game</button>
+      </div>
+    </main>
+    <script src="script.js"></script>
+  </body>
 </html>

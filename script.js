@@ -1,91 +1,97 @@
-// Gameboard Factory
-const createGameboard = () => {
-      const board = ['', '', '', '', '', '', '', '', ''];
+// Player constructor
+function Player(name, symbol) {
+  this.name = name;
+  this.symbol = symbol;
+}
 
-      const checkWinner = () => {
-        // Add logic to check for a winner
-      };
+// Gameboard object
+const Gameboard = {
+  board: Array(9).fill(null),
 
-      const checkTie = () => {
-        // Add logic to check for a tie
-      };
+  // Method to reset the board
+  resetBoard: function () {
+      this.board = Array(9).fill(null);
+  },
 
-      return {
-        board,
-        checkWinner,
-        checkTie,
-      };
-    };
+  // Method to check if the board is full
+  isBoardFull: function () {
+      return this.board.every(cell => cell !== null);
+  }
+};
 
-    // Player Factory
-const createPlayer = (name, marker) => {
-      return {
-        name,
-        marker,
-      };
-    };
+// Game object
+const Game = {
+  players: [new Player("Player 1", "X"), new Player("Player 2", "O")],
+  currentPlayer: null,
+  gameOver: false,
 
-    // Game Controller
-const gameController = (() => {
-      let currentPlayer;
-      let gameActive = false;
+  // Method to switch players
+  switchPlayer: function () {
+      this.currentPlayer = (this.currentPlayer === this.players[0]) ? this.players[1] : this.players[0];
+  },
 
-      const gameboard = createGameboard();
-      const player1 = createPlayer(document.getElementById('player1').value, 'X');
-      const player2 = createPlayer(document.getElementById('player2').value, 'O');
+  // Method to check for a win
+  checkWin: function () {
+      const winConditions = [
+          [0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
+          [0, 3, 6], [1, 4, 7], [2, 5, 8], // Columns
+          [0, 4, 8], [2, 4, 6]             // Diagonals
+      ];
 
-      const switchPlayer = () => {
-        currentPlayer = currentPlayer === player1 ? player2 : player1;
-      };
+      return winConditions.some(condition => {
+          const [a, b, c] = condition;
+          return (Gameboard.board[a] === this.currentPlayer.symbol &&
+              Gameboard.board[b] === this.currentPlayer.symbol &&
+              Gameboard.board[c] === this.currentPlayer.symbol);
+      });
+  },
 
-      const handleCellClick = (index) => {
-        if (gameboard.board[index] === '' && gameActive) {
-          gameboard.board[index] = currentPlayer.marker;
-          // Add logic to update the display and check for a winner/tie
-          switchPlayer();
-        }
-      };
+  // Method to handle a move
+  makeMove: function (index) {
+      if (!this.gameOver && Gameboard.board[index] === null) {
+          Gameboard.board[index] = this.currentPlayer.symbol;
+          if (this.checkWin()) {
+              displayMessage(`${this.currentPlayer.name} wins!`);
+              this.gameOver = true;
+          } else if (Gameboard.isBoardFull()) {
+              displayMessage("It's a draw!");
+              this.gameOver = true;
+          } else {
+              this.switchPlayer();
+          }
+          updateBoard();
+      }
+  },
 
+  // Method to start the game
+  startGame: function () {
+      this.currentPlayer = this.players[0];
+      this.gameOver = false;
+      Gameboard.resetBoard();
+      updateBoard();
+  }
+};
 
-    const startGame = () => {
-        currentPlayer = player1;
-        gameActive = true;
-        gameboard.resetBoard();
-        displayController.renderBoard();
-        // Initialize the display and other necessary setup
-      };
+// Function to update the board display
+function updateBoard() {
+  const cells = document.querySelectorAll('.cell');
+  cells.forEach((cell, index) => {
+      cell.textContent = Gameboard.board[index] || '';
+      cell.onclick = () => Game.makeMove(index);
+  });
+}
 
-      return {
-        handleCellClick,
-        startGame,
-      };
-})();
+// Function to display a message
+function displayMessage(message) {
+  const messageElement = document.getElementById('message');
+  messageElement.textContent = message;
+}
 
-    // Display Controller
-    const displayController = (() => {
-      const gameBoardElement = document.getElementById('gameBoard');
-      const gameResultElement = document.getElementById('gameResult');
+// Function to reset the game
+function resetGame() {
+  Game.startGame();
+  displayMessage('');
+}
 
-
-      const renderBoard = () => {
-        gameBoardElement.innerHTML = '';
-        gameController.gameboard.board.forEach((cell, index) => {
-          const cellElement = document.createElement('div');
-          cellElement.classList.add('cell');
-          cellElement.textContent = cell;
-          cellElement.addEventListener('click', () => gameController.handleCellClick(index));
-          gameBoardElement.appendChild(cellElement);
-        });
-      };
-
-      // Additional functions to update the display as the game progresses
-
-      return {
-        renderBoard,
-        // Add other display-related functions here
-      };
-})();
-
-    // Initial setup
-    // Add event listeners, initialize the display, etc.
-
+// Start the game initially
+Game.startGame();
