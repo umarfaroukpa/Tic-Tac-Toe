@@ -95,3 +95,6 @@ function resetGame() {
 
 // Start the game initially
 Game.startGame();
+
+
+
